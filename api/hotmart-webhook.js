@@ -1,5 +1,5 @@
 // api/hotmart-webhook.js
-// Webhook Hotmart — formato Vercel (substitui netlify/functions/hotmart-webhook.js)
+// Webhook Hotmart — formato Vercel
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -39,18 +39,15 @@ module.exports = async (req, res) => {
     payload:            body,
     processado:         false
   });
+
   try {
-
     // ——— COMPRA APROVADA ———
-
     if (evento === 'PURCHASE_APPROVED') {
-
       if (!email || !hotmartProdId) {
-
         return res.status(200).json({ ok: true, msg: 'Dados incompletos' });
-
       }
-      // Libera acesso + bônus via função SQL
+
+      // Libera acesso via função SQL (Certifique-se que a função SQL usa 'members' internamente)
       const { data, error } = await supabase.rpc('liberar_acesso', {
         p_email:        email,
         p_nome:         nome,
@@ -79,21 +76,25 @@ module.exports = async (req, res) => {
     // ——— REEMBOLSO / CHARGEBACK / CANCELAMENTO ———
     if (['PURCHASE_REFUNDED','PURCHASE_CHARGEBACK','PURCHASE_CANCELED','SUBSCRIPTION_CANCELLATION'].includes(evento)) {
       if (email && hotmartProdId) {
+        // AJUSTE: Tabela 'members' (inglês) conforme seu print
         const { data: membro } = await supabase
-          .from('membros').select('id').eq('email', email).single();
+          .from('members').select('id').eq('email', email).single();
+          
+        // AJUSTE: Tabela 'products' (assumindo que segue o padrão do seu banco)
         const { data: produto } = await supabase
-          .from('produtos').select('id').eq('hotmart_id', hotmartProdId).single();
+          .from('products').select('id').eq('hotmart_id', hotmartProdId).single();
 
         if (membro && produto) {
-          await supabase.from('acessos')
-            .update({ ativo: false })
-            .eq('membro_id', membro.id)
-            .eq('produto_id', produto.id);
+          // AJUSTE: Tabela 'access' e coluna 'active' conforme seu print
+          await supabase.from('access')
+            .update({ active: false })
+            .eq('member_id', membro.id)
+            .eq('product_id', produto.id);
 
-          // Invalida sessões ativas do membro
-          await supabase.from('sessoes')
+          // AJUSTE: Tabela 'sessions'
+          await supabase.from('sessions')
             .update({ expires_at: new Date().toISOString() })
-            .eq('membro_id', membro.id);
+            .eq('member_id', membro.id);
 
           console.log(`[Webhook] Acesso revogado: ${email}`);
         }
@@ -105,7 +106,7 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error('[Webhook] Erro inesperado:', err);
-    await logErro(supabase, transacaoId, err.message);
+    if (transacaoId) await logErro(supabase, transacaoId, err.message);
     return res.status(500).json({ error: 'Erro interno' });
   }
 };
@@ -113,17 +114,17 @@ module.exports = async (req, res) => {
 async function enviarEmailBoasVindas(supabase, email, nome) {
   if (!RESEND_API_KEY) return;
   try {
-    // Gera magic link de boas-vindas
     const token = generateToken();
-    const expires = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72h na compra
+    const expires = new Date(Date.now() + 72 * 60 * 60 * 1000);
 
+    // AJUSTE: Tabela 'members' (inglês)
     const { data: membro } = await supabase
-      .from('membros').select('id').eq('email', email).single();
+      .from('members').select('id').eq('email', email).single();
 
     if (!membro) return;
 
     await supabase.from('magic_tokens').insert({
-      membro_id:  membro.id,
+      member_id:  membro.id, // AJUSTE: member_id
       email,
       token,
       expires_at: expires.toISOString(),
