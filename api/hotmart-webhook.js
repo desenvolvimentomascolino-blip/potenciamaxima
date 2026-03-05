@@ -39,7 +39,6 @@ module.exports = async (req, res) => {
     payload:            body,
     processado:         false
   });
-
   try {
 
     // ——— COMPRA APROVADA ———
