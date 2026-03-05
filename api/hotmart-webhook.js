@@ -68,8 +68,7 @@ module.exports = async (req, res) => {
 
       await supabase.from('webhook_log')
         .update({ processado: true })
-        .eq('transacao_id', transacaoId)
-        .catch(console.error);
+        .eq('transacao_id', transacaoId);
 
       return res.status(200).json({ ok: true });
     }
