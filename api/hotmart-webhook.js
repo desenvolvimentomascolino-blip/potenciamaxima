@@ -157,7 +157,7 @@ function generateToken() {
 
 async function logErro(supabase, transacaoId, erro) {
   if (!transacaoId) return;
-  await supabase.from('webhook_log').update({ erro }).eq('transacao_id', transacaoId).catch(()=>{});
+  await supabase.from('webhook_log').update({ erro }).eq('transacao_id', transacaoId);
 }
 
 function buildBoasVindasHtml(nome, link) {
