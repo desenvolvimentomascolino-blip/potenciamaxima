@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     transacao_id:       transacaoId,
     payload:            body,
     processado:         false
-  }).catch(console.error);
+  });
 
   try {
 
