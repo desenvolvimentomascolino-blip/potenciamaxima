@@ -47,11 +47,19 @@ module.exports = async (req, res) => {
         return res.status(200).json({ ok: true, msg: 'Dados incompletos' });
       }
 
-      await supabase.from('members').upsert({ 
-        email: email, 
-        name: nome,    
-        active: true   
-      }, { onConflict: 'email' });
+      // Vamos usar apenas o email como chave para o banco decidir o que fazer
+      const { error: upsertError } = await supabase
+        .from('members')
+        .upsert({ 
+          email: email, 
+          name: nome,    
+          active: true   
+        }, { onConflict: 'email' });
+
+      if (upsertError) {
+          console.error('Erro no Supabase:', upsertError);
+          throw upsertError;
+      }
     }
       // Libera acesso + bônus via função SQL
       const { data, error } = await supabase.rpc('liberar_acesso', {
