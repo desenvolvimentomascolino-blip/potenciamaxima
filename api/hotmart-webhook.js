@@ -42,9 +42,14 @@ module.exports = async (req, res) => {
   try {
 
     // ——— COMPRA APROVADA ———
-if (evento === 'PURCHASE_APPROVED') {
-  await supabase.from('members').upsert({ email, name: nome, active: true }, { onConflict: 'email' });
-}
+
+    if (evento === 'PURCHASE_APPROVED') {
+
+      if (!email || !hotmartProdId) {
+
+        return res.status(200).json({ ok: true, msg: 'Dados incompletos' });
+
+      }
       // Libera acesso + bônus via função SQL
       const { data, error } = await supabase.rpc('liberar_acesso', {
         p_email:        email,
