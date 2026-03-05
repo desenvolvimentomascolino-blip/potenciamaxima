@@ -96,3 +96,53 @@ CREATE POLICY "Progresso: inserção/atualização"
 -- Verificar se um email tem acesso a um produto:
 -- SELECT active FROM members WHERE email = 'usuario@email.com' AND product_id = 'potencia-maxima' AND active = true;
 -- ===========================
+
+
+-- ============================================================
+--  ATUALIZAÇÃO DO SCHEMA — Magic Links, Sessões e Vídeos
+--  Cole este bloco no SQL Editor do Supabase
+-- ============================================================
+
+-- Adiciona campo video_url na tabela produtos (se não existir)
+ALTER TABLE produtos ADD COLUMN IF NOT EXISTS video_url TEXT;
+
+-- ============================================================
+--  MAGIC TOKENS (links de acesso por e-mail)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS magic_tokens (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  membro_id   UUID NOT NULL REFERENCES membros(id) ON DELETE CASCADE,
+  email       TEXT NOT NULL,
+  token       TEXT NOT NULL UNIQUE,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used        BOOLEAN DEFAULT false,
+  used_at     TIMESTAMPTZ,
+  criado_em   TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_magic_token ON magic_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_magic_email ON magic_tokens(email);
+
+-- Limpeza automática de tokens velhos (roda via cron ou manualmente)
+-- DELETE FROM magic_tokens WHERE expires_at < NOW() - INTERVAL '1 day';
+
+-- ============================================================
+--  SESSÕES (mantém usuário logado por 7 dias)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS sessoes (
+  id          TEXT PRIMARY KEY,   -- session ID gerado no backend
+  membro_id   UUID NOT NULL REFERENCES membros(id) ON DELETE CASCADE,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  criado_em   TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_sessoes_membro ON sessoes(membro_id);
+
+-- RLS para novas tabelas
+ALTER TABLE magic_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessoes ENABLE ROW LEVEL SECURITY;
+
+-- Somente service_role acessa essas tabelas (backend)
+CREATE POLICY "magic_tokens_service" ON magic_tokens
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "sessoes_service" ON sessoes
+  FOR ALL USING (auth.role() = 'service_role');

@@ -481,7 +481,7 @@ textarea.form-input{resize:vertical;min-height:76px}
 <!-- ============================
      PAGE: LOGIN
 ============================ -->
-<div id="page-login" class="page" style="background:radial-gradient(ellipse at 50% 0%,rgba(232,0,45,.15) 0%,var(--bg) 55%);align-items:center;justify-content:center;padding:20px">
+<div id="page-login" class="page" style="background:radial-gradient(ellipse at 50% 0%,rgba(232,0,45,.15) 0%,var(--bg) 55%);align-items:center;justify-content:center;padding:20px;min-height:100dvh">
   <div style="width:100%;max-width:380px" class="fade-up">
     <div style="text-align:center;margin-bottom:32px">
       <div style="font-size:46px;margin-bottom:10px">🔐</div>
@@ -489,27 +489,59 @@ textarea.form-input{resize:vertical;min-height:76px}
       <div style="font-family:Sora,sans-serif;font-size:14px;font-weight:700;color:var(--primary);letter-spacing:.5px">POTÊNCIA MÁXIMA</div>
       <p style="color:var(--text-3);font-size:13px;margin-top:8px;line-height:1.5">Apenas membros autorizados têm acesso a este conteúdo exclusivo.</p>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--card-border);border-radius:18px;padding:28px">
-      <h2 style="font-size:18px;font-weight:800;margin-bottom:20px">Acessar minha conta</h2>
+
+    <!-- Estado: formulário -->
+    <div id="login-form-wrap" style="background:var(--surface);border:1px solid var(--card-border);border-radius:18px;padding:28px">
+      <h2 style="font-size:18px;font-weight:800;margin-bottom:6px">Acessar minha conta</h2>
+      <p style="font-size:13px;color:var(--text-3);margin-bottom:20px;line-height:1.5">Digite o e-mail que você usou na compra e enviaremos um link de acesso.</p>
       <div class="form-group">
-        <label class="form-label">Seu nome</label>
-        <input class="form-input" id="login-name" type="text" placeholder="Como você se chama?">
+        <label class="form-label">E-mail de acesso</label>
+        <input class="form-input" id="login-email" type="email" placeholder="seu@email.com"
+          onkeydown="if(event.key==='Enter')doLogin()">
       </div>
-      <div class="form-group">
-        <label class="form-label">Email de acesso</label>
-        <input class="form-input" id="login-email" type="email" placeholder="seu@email.com">
-      </div>
-      <button class="btn btn-primary btn-full" style="margin-top:6px;font-size:14px;padding:14px" onclick="doLogin()">
-        <span class="material-symbols-outlined" style="font-size:18px">lock_open</span>
-        Entrar na Área Restrita
+      <div id="login-err" style="color:#f87171;font-size:12px;margin:-8px 0 12px;display:none"></div>
+      <button class="btn btn-primary btn-full" style="font-size:14px;padding:14px" onclick="doLogin()" id="login-btn">
+        <span class="material-symbols-outlined" style="font-size:18px">send</span>
+        Enviar link de acesso
       </button>
       <div style="margin-top:18px;text-align:center;border-top:1px solid var(--card-border);padding-top:16px">
-        <a href="#" style="font-size:12px;color:var(--text-3);display:inline-flex;align-items:center;gap:4px">
+        <button onclick="showRecovery()" style="font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
           <span class="material-symbols-outlined" style="font-size:15px">help</span>
-          Não consigo acessar minha conta
-        </a>
+          Comprei mas não recebi acesso
+        </button>
       </div>
     </div>
+
+    <!-- Estado: link enviado -->
+    <div id="login-sent-wrap" style="display:none;background:var(--surface);border:1px solid var(--card-border);border-radius:18px;padding:28px;text-align:center">
+      <div style="width:64px;height:64px;background:rgba(16,185,129,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <span class="material-symbols-outlined" style="color:#10b981;font-size:32px">mark_email_read</span>
+      </div>
+      <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">Link enviado!</h2>
+      <p style="font-size:13px;color:var(--text-3);line-height:1.6;margin-bottom:20px">Verifique sua caixa de entrada e pasta de spam. O link expira em <strong style="color:var(--text)">30 minutos</strong>.</p>
+      <p id="login-sent-email" style="font-size:12px;color:var(--primary);font-weight:700;margin-bottom:20px"></p>
+      <button onclick="showLoginForm()" style="font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer">← Voltar</button>
+    </div>
+
+    <!-- Estado: recuperação -->
+    <div id="login-recovery-wrap" style="display:none;background:var(--surface);border:1px solid var(--card-border);border-radius:18px;padding:28px">
+      <h2 style="font-size:18px;font-weight:800;margin-bottom:6px">Recuperar acesso</h2>
+      <p style="font-size:13px;color:var(--text-3);margin-bottom:20px;line-height:1.5">Digite o e-mail da sua compra. Se estiver cadastrado, reenviaremos o link.</p>
+      <div class="form-group">
+        <label class="form-label">E-mail da compra</label>
+        <input class="form-input" id="recovery-email" type="email" placeholder="seu@email.com"
+          onkeydown="if(event.key==='Enter')doRecovery()">
+      </div>
+      <div id="recovery-err" style="color:#f87171;font-size:12px;margin:-8px 0 12px;display:none"></div>
+      <button class="btn btn-primary btn-full" style="font-size:14px;padding:14px" onclick="doRecovery()" id="recovery-btn">
+        <span class="material-symbols-outlined" style="font-size:18px">refresh</span>
+        Reenviar meu acesso
+      </button>
+      <div style="text-align:center;margin-top:14px">
+        <button onclick="showLoginForm()" style="font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer">← Voltar</button>
+      </div>
+    </div>
+
     <p style="text-align:center;color:var(--text-3);font-size:11px;margin-top:18px">Conteúdo protegido · Acesso via Hotmart</p>
   </div>
 </div>
@@ -916,9 +948,61 @@ textarea.form-input{resize:vertical;min-height:76px}
     </div>
 
     <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);border-radius:12px;padding:13px">
-      <p style="font-size:11px;color:var(--text-2);line-height:1.6">💡 As alterações de aparência são salvas localmente. Você verá a prévia ao navegar pela área de membros. Para produção definitiva, use o campo de URL da imagem com links públicos (Google Drive, Cloudinary, etc.).</p>
+      <p style="font-size:11px;color:var(--text-2);line-height:1.6">💡 Todas as alterações são aplicadas em tempo real. Salve para persistir entre sessões.</p>
     </div>
-  </div>
+
+    <!-- Background -->
+    <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;padding:18px;margin-top:12px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+        <div style="width:38px;height:38px;background:rgba(16,185,129,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span class="material-symbols-outlined" style="color:#10b981;font-size:20px">gradient</span>
+        </div>
+        <div><h4 style="font-size:14px;font-weight:800">Fundo da Plataforma</h4><p style="font-size:11px;color:var(--text-3)">Cor sólida ou gradiente para o fundo geral</p></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:14px">
+        <button class="ap-bg-mode active" data-mode="solid" onclick="setBgMode('solid',this)" style="flex:1;padding:9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--card-border);background:var(--surface);color:var(--text-2);transition:all .2s">Cor sólida</button>
+        <button class="ap-bg-mode" data-mode="gradient" onclick="setBgMode('gradient',this)" style="flex:1;padding:9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--card-border);background:var(--surface);color:var(--text-2);transition:all .2s">Gradiente</button>
+      </div>
+      <div id="ap-solid-wrap" class="form-group">
+        <label class="form-label">Cor de fundo</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="ap-bg-color" value="#0a0608" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer" oninput="previewBg()">
+          <input class="form-input" id="ap-bg-hex" placeholder="#0a0608" style="flex:1" oninput="syncColorFromHex('bg');previewBg()">
+        </div>
+      </div>
+      <div id="ap-gradient-wrap" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Cor 1</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="ap-grad1" value="#0a0608" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer" oninput="previewBg()">
+              <input class="form-input" id="ap-grad1-hex" placeholder="#0a0608" style="flex:1" oninput="previewBg()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cor 2</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="ap-grad2" value="#1a0c11" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer" oninput="previewBg()">
+              <input class="form-input" id="ap-grad2-hex" placeholder="#1a0c11" style="flex:1" oninput="previewBg()">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Direção do gradiente</label>
+          <select class="form-input" id="ap-grad-dir" onchange="previewBg()">
+            <option value="to bottom">↓ Cima para baixo</option>
+            <option value="to right">→ Esquerda para direita</option>
+            <option value="135deg">↘ Diagonal</option>
+            <option value="to bottom right">↘ Diagonal suave</option>
+          </select>
+        </div>
+      </div>
+      <!-- Live preview strip -->
+      <div id="ap-bg-preview" style="width:100%;height:48px;border-radius:10px;border:1px solid var(--card-border);margin-top:4px;margin-bottom:14px;transition:background .3s"></div>
+      <button class="btn btn-primary btn-sm" onclick="saveAppearanceSettings()">
+        <span class="material-symbols-outlined" style="font-size:16px">save</span>Salvar Fundo
+      </button>
+    </div>
 
   <!-- Hotmart -->
   <div id="as-hotmart" style="display:none;padding:0 20px">
@@ -1015,7 +1099,7 @@ textarea.form-input{resize:vertical;min-height:76px}
     <div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="pf-title" placeholder="Ex: Potência Máxima Premium"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Tipo</label>
-        <select class="form-input" id="pf-type"><option>Ebook</option><option>Curso</option><option>Mentoria</option><option>Bônus</option></select>
+        <select class="form-input" id="pf-type"><option>Ebook</option><option>Curso</option><option>Vídeo</option><option>Mentoria</option><option>Bônus</option></select>
       </div>
       <div class="form-group"><label class="form-label">Categoria</label>
         <select class="form-input" id="pf-cat"></select>
@@ -1024,6 +1108,8 @@ textarea.form-input{resize:vertical;min-height:76px}
     <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-input" id="pf-desc" rows="2" placeholder="Descreva o produto..."></textarea></div>
     <div class="form-group"><label class="form-label">URL da capa (imagem 2:3 vertical)</label><input class="form-input" id="pf-cover" placeholder="https://..."></div>
     <div class="form-group"><label class="form-label">URL do banner (16:9 horizontal)</label><input class="form-input" id="pf-banner" placeholder="https://..."></div>
+    <div class="form-group"><label class="form-label">URL do PDF / arquivo para download</label><input class="form-input" id="pf-pdf" placeholder="https://..."></div>
+    <div class="form-group"><label class="form-label">URL do vídeo (YouTube, Vimeo ou direto)</label><input class="form-input" id="pf-video" placeholder="https://youtube.com/embed/... ou https://vimeo.com/..."><p style="font-size:10px;color:var(--text-3);margin-top:3px">Para YouTube use o link de incorporação: youtube.com/embed/ID_DO_VIDEO</p></div>
     <div class="form-group"><label class="form-label">URL da página de vendas (produto bloqueado → redireciona aqui)</label><input class="form-input" id="pf-sales" placeholder="https://pay.hotmart.com/..."></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Preço exibido</label><input class="form-input" id="pf-price" placeholder="R$ 97,00"></div>
@@ -1181,29 +1267,14 @@ function toggleTheme() {
   localStorage.setItem('pm_theme', state.theme);
   applyTheme();
 }
-function applyAppearance() {
-  const r = document.documentElement.style;
-  if (state.appearance.primaryColor) {
-    const hex = state.appearance.primaryColor;
-    const bigint = parseInt(hex.slice(1),16);
-    const rd=((bigint>>16)&255), gd=((bigint>>8)&255), bd=(bigint&255);
-    r.setProperty('--primary', hex);
-    r.setProperty('--primary-h', shadeHex(hex,-20));
-    r.setProperty('--primary-glow', `rgba(${rd},${gd},${bd},0.25)`);
-  } else {
-    r.removeProperty('--primary'); r.removeProperty('--primary-h'); r.removeProperty('--primary-glow');
-  }
-  if (state.appearance.textColor) r.setProperty('--text', state.appearance.textColor);
-  else r.removeProperty('--text');
-}
-function shadeHex(hex, pct) {
-  let n=parseInt(hex.slice(1),16),r=Math.min(255,Math.max(0,(n>>16)+pct)),g=Math.min(255,Math.max(0,((n>>8)&0xFF)+pct)),b=Math.min(255,Math.max(0,(n&0xFF)+pct));
-  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-}
 
 // ============================================================
 //  TOAST
 // ============================================================
+function shadeHex(hex, pct) {
+  let n=parseInt(hex.slice(1),16),r=Math.min(255,Math.max(0,(n>>16)+pct)),g=Math.min(255,Math.max(0,((n>>8)&0xFF)+pct)),b=Math.min(255,Math.max(0,(n&0xFF)+pct));
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
 let _tt;
 function toast(msg, type='success') {
   const el = document.getElementById('toast');
@@ -1249,21 +1320,159 @@ function navigateTo(p) {
 }
 
 // ============================================================
-//  AUTH
+//  AUTH — Magic Link real
 // ============================================================
-function doLogin() {
-  const name = document.getElementById('login-name').value.trim();
-  const email = document.getElementById('login-email').value.trim();
-  if (!name || !email) { toast('Preencha nome e email','error'); return; }
-  if (!email.includes('@')) { toast('Email inválido','error'); return; }
-  state.user = { name, email, joinDate: new Date().toLocaleDateString('pt-BR') };
-  saveUser();
-  toast('Bem-vindo(a), ' + name.split(' ')[0] + '! 🔐','success');
-  navigateTo('home');
+function showLoginForm() {
+  document.getElementById('login-form-wrap').style.display = '';
+  document.getElementById('login-sent-wrap').style.display = 'none';
+  document.getElementById('login-recovery-wrap').style.display = 'none';
 }
+function showRecovery() {
+  document.getElementById('login-form-wrap').style.display = 'none';
+  document.getElementById('login-sent-wrap').style.display = 'none';
+  document.getElementById('login-recovery-wrap').style.display = '';
+  setTimeout(() => document.getElementById('recovery-email')?.focus(), 100);
+}
+function showSent(email) {
+  document.getElementById('login-form-wrap').style.display = 'none';
+  document.getElementById('login-recovery-wrap').style.display = 'none';
+  document.getElementById('login-sent-wrap').style.display = '';
+  const el = document.getElementById('login-sent-email');
+  if (el) el.textContent = email;
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+  if (!email || !email.includes('@')) { errEl.textContent = 'Digite um e-mail válido.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    const r = await fetch('/api/magic-link', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const d = await r.json();
+    if (r.ok) { showSent(email); }
+    else { errEl.textContent = d.error || 'Erro ao enviar. Tente novamente.'; errEl.style.display = 'block'; }
+  } catch(e) {
+    errEl.textContent = 'Sem conexão. Verifique sua internet.'; errEl.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">send</span> Enviar link de acesso';
+}
+
+async function doRecovery() {
+  const email = document.getElementById('recovery-email').value.trim().toLowerCase();
+  const errEl = document.getElementById('recovery-err');
+  errEl.style.display = 'none';
+  if (!email || !email.includes('@')) { errEl.textContent = 'Digite um e-mail válido.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('recovery-btn');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  try {
+    const r = await fetch('/api/magic-link', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    showSent(email);
+  } catch(e) {
+    errEl.textContent = 'Sem conexão. Verifique sua internet.'; errEl.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">refresh</span> Reenviar meu acesso';
+}
+
+async function verifyToken(token) {
+  // Show loading while verifying
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.body.insertAdjacentHTML('beforeend',
+    '<div id="token-loading" style="position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999">' +
+    '<div style="font-size:36px;margin-bottom:16px">🔐</div>' +
+    '<p style="color:var(--text-2);font-size:14px">Verificando seu acesso...</p></div>'
+  );
+  try {
+    const r = await fetch('/api/verify-token', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const d = await r.json();
+    document.getElementById('token-loading')?.remove();
+    if (r.ok && d.ok) {
+      // Save session
+      localStorage.setItem('pm_session', d.sessao);
+      localStorage.setItem('pm_session_exp', d.expira);
+      applySession(d);
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+      navigateTo('home');
+    } else {
+      toast(d.error || 'Link inválido ou expirado.', 'error');
+      navigateTo('login');
+    }
+  } catch(e) {
+    document.getElementById('token-loading')?.remove();
+    toast('Erro de conexão. Tente novamente.', 'error');
+    navigateTo('login');
+  }
+}
+
+async function loadSession() {
+  const sessaoId = localStorage.getItem('pm_session');
+  const expira   = localStorage.getItem('pm_session_exp');
+  if (!sessaoId) return false;
+  if (expira && new Date(expira) < new Date()) {
+    localStorage.removeItem('pm_session');
+    localStorage.removeItem('pm_session_exp');
+    return false;
+  }
+  try {
+    const r = await fetch('/api/session', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessaoId })
+    });
+    if (!r.ok) { localStorage.removeItem('pm_session'); return false; }
+    const d = await r.json();
+    applySession(d);
+    return true;
+  } catch(e) { return false; }
+}
+
+function applySession(d) {
+  state.user = {
+    id:       d.membro.id,
+    name:     d.membro.nome || d.membro.email.split('@')[0],
+    email:    d.membro.email,
+    joinDate: new Date().toLocaleDateString('pt-BR')
+  };
+  // Merge server products (unlocked) with local product list
+  if (d.produtos && d.produtos.length) {
+    const serverUnlocked = new Set(d.produtos.map(p => p.hotmart_id || p.id));
+    state.products = state.products.map(p => ({
+      ...p,
+      unlocked: p.unlocked || serverUnlocked.has(p.hotmart_id) || serverUnlocked.has(p.id)
+    }));
+    // Also unlock bonuses
+    state.products.forEach(p => {
+      if (p.unlocked && p.bonusIds?.length) {
+        p.bonusIds.forEach(bid => {
+          const bonus = state.products.find(b => b.id === bid);
+          if (bonus) bonus.unlocked = true;
+        });
+      }
+    });
+  }
+  saveUser();
+  updateSidebarUser();
+}
+
 function doLogout() {
-  state.user = null; saveUser();
-  localStorage.removeItem('pm_admin'); state.isAdmin = false;
+  state.user = null;
+  localStorage.removeItem('pm_user');
+  localStorage.removeItem('pm_session');
+  localStorage.removeItem('pm_session_exp');
+  localStorage.removeItem('pm_admin');
+  state.isAdmin = false;
   navigateTo('login');
 }
 
@@ -1533,17 +1742,83 @@ function openReader(id) {
   if (!p) return;
   if (!p.unlocked) { openDetail(id); return; }
   state.readerProductId = id;
+
+  const isVideo = p.type === 'Vídeo' || !!p.videoUrl;
+  const readerBody = document.querySelector('.reader-body');
+  const readerCover = document.querySelector('.reader-cover');
+
   document.getElementById('reader-title').textContent = p.title;
-  document.getElementById('reader-img').src = p.banner || p.cover;
   document.getElementById('reader-h2').textContent = p.title;
   document.getElementById('reader-chip').textContent = p.type;
-  document.getElementById('reader-chip').className = 'chip ' + getChipClass(p.type) + ' ' + 'chip-' + getChipClass(p.type).split('-')[1];
+  document.getElementById('reader-chip').className = 'chip ' + getChipClass(p.type) + ' chip-' + getChipClass(p.type).split('-')[1];
   document.getElementById('reader-desc').textContent = p.description;
+
+  if (isVideo && p.videoUrl) {
+    // Show video player, hide cover image
+    if (readerCover) readerCover.style.display = 'none';
+    // Get or create video container
+    let videoWrap = document.getElementById('reader-video-wrap');
+    if (!videoWrap) {
+      videoWrap = document.createElement('div');
+      videoWrap.id = 'reader-video-wrap';
+      videoWrap.style.cssText = 'width:100%;background:#000;position:relative';
+      document.querySelector('.reader-article').prepend(videoWrap);
+    }
+    videoWrap.style.display = '';
+    const embedUrl = buildVideoEmbed(p.videoUrl);
+    videoWrap.innerHTML = embedUrl
+      ? `<div style="position:relative;padding-top:56.25%;background:#000">
+           <iframe src="${embedUrl}" style="position:absolute;inset:0;width:100%;height:100%;border:0"
+             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+             allowfullscreen loading="lazy"></iframe>
+         </div>`
+      : `<video src="${p.videoUrl}" controls style="width:100%;max-height:360px;background:#000" preload="metadata"></video>`;
+  } else {
+    // Show cover image
+    const videoWrap = document.getElementById('reader-video-wrap');
+    if (videoWrap) videoWrap.style.display = 'none';
+    if (readerCover) readerCover.style.display = '';
+    document.getElementById('reader-img').src = p.banner || p.cover;
+  }
+
+  // PDF download button
+  if (readerBody) {
+    let pdfBtn = document.getElementById('reader-pdf-btn');
+    if (p.pdf_url || p.pdfUrl) {
+      if (!pdfBtn) {
+        pdfBtn = document.createElement('a');
+        pdfBtn.id = 'reader-pdf-btn';
+        pdfBtn.className = 'btn btn-ghost btn-sm';
+        pdfBtn.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;text-decoration:none';
+        pdfBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">download</span> Baixar PDF';
+        readerBody.prepend(pdfBtn);
+      }
+      pdfBtn.href = p.pdf_url || p.pdfUrl;
+      pdfBtn.target = '_blank';
+      pdfBtn.style.display = 'inline-flex';
+    } else if (pdfBtn) {
+      pdfBtn.style.display = 'none';
+    }
+  }
+
   const pct = p.progress || 0;
   document.getElementById('reader-pct').textContent = pct + '%';
   document.getElementById('reader-pbar').style.width = pct + '%';
   document.getElementById('reader-advance-btn').textContent = pct >= 100 ? '✓ Concluído' : 'Avançar →';
   navigateTo('reader');
+}
+
+function buildVideoEmbed(url) {
+  if (!url) return null;
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  // Already an embed URL
+  if (url.includes('/embed/') || url.includes('player.vimeo')) return url;
+  return null; // direct video file
 }
 function readerAdvance(delta) {
   const p = state.products.find(x => x.id === state.readerProductId);
@@ -1647,7 +1922,9 @@ function fillCatSelect(current) {
 function openAddProduct() {
   document.getElementById('modal-prod-h').textContent = 'Adicionar Produto';
   document.getElementById('pf-id').value='';
-  ['title','desc','cover','banner','price','hotmart','duration','sales','bonus'].forEach(f => document.getElementById('pf-'+f).value='');
+  ['title','desc','cover','banner','price','hotmart','duration','sales','bonus','video'].forEach(f => {
+    const el = document.getElementById('pf-'+f); if(el) el.value='';
+  });
   document.getElementById('pf-type').value='Ebook';
   fillCatSelect(state.categories[0]||'');
   document.getElementById('pf-status').checked=true;
@@ -1671,6 +1948,7 @@ function openEditProduct(id) {
   document.getElementById('pf-duration').value=p.duration||'';
   document.getElementById('pf-sales').value=p.salesUrl||'';
   document.getElementById('pf-bonus').value=(p.bonusIds||[]).join(', ');
+  const vEl = document.getElementById('pf-video'); if(vEl) vEl.value=p.videoUrl||'';
   document.getElementById('pf-status').checked=p.status==='published';
   document.getElementById('pf-unlocked').checked=!!p.unlocked;
   document.getElementById('pf-featured').checked=!!p.featured;
@@ -1682,6 +1960,7 @@ function saveProduct() {
   const title = document.getElementById('pf-title').value.trim();
   if (!title) { toast('Nome é obrigatório','error'); return; }
   const existId = document.getElementById('pf-id').value;
+  const vEl = document.getElementById('pf-video');
   const prod = {
     id: existId || String(Date.now()),
     title,
@@ -1690,6 +1969,7 @@ function saveProduct() {
     description:document.getElementById('pf-desc').value.trim(),
     cover:document.getElementById('pf-cover').value.trim(),
     banner:document.getElementById('pf-banner').value.trim(),
+    videoUrl: vEl ? vEl.value.trim() : '',
     price:document.getElementById('pf-price').value.trim(),
     hotmart_id:document.getElementById('pf-hotmart').value.trim(),
     duration:document.getElementById('pf-duration').value.trim(),
@@ -1703,11 +1983,11 @@ function saveProduct() {
   if (existId) {
     const wasUnlocked = state.products.find(p=>p.id===existId)?.unlocked;
     state.products=state.products.map(p=>p.id===existId?prod:p);
-    // If just unlocked, also unlock bonuses
     if(!wasUnlocked && prod.unlocked) unlockProductWithBonuses(existId);
     toast('Produto atualizado! ✅','success');
+  } else {
+    state.products.push(prod); toast('Produto adicionado! ✅','success');
   }
-  else { state.products.push(prod); toast('Produto adicionado! ✅','success'); }
   saveProds(); closeModal(); renderAdminProds(); renderAdmin();
 }
 function deleteProduct(id) {
@@ -1733,58 +2013,151 @@ function loadAppearanceForm() {
   const a = state.appearance;
   const bgEl = document.getElementById('ap-hero-bg');
   if (bgEl) bgEl.value = a.heroBg || '';
-  const pc = a.primaryColor || '#e8002d';
-  const tc = a.textColor || '#f5e8ec';
-  const pcEl = document.getElementById('ap-primary-color'); if(pcEl) pcEl.value = pc;
-  const pcHex = document.getElementById('ap-primary-hex'); if(pcHex) pcHex.value = pc;
-  const tcEl = document.getElementById('ap-text-color'); if(tcEl) tcEl.value = tc;
-  const tcHex = document.getElementById('ap-text-hex'); if(tcHex) tcHex.value = tc;
-  // Sync color pickers
-  if(pcEl) pcEl.oninput = () => { document.getElementById('ap-primary-hex').value = pcEl.value; };
-  if(tcEl) tcEl.oninput = () => { document.getElementById('ap-text-hex').value = tcEl.value; };
-  // Preview
-  if (bgEl) bgEl.oninput = () => {
-    const v = bgEl.value.trim();
-    const prev = document.getElementById('ap-hero-preview');
-    const img = document.getElementById('ap-hero-preview-img');
-    if(v && prev && img) { prev.style.display='block'; img.src=v; }
-    else if(prev) prev.style.display='none';
-  };
-  if (bgEl && bgEl.value) {
-    const prev = document.getElementById('ap-hero-preview');
-    const img = document.getElementById('ap-hero-preview-img');
-    if(prev && img) { prev.style.display='block'; img.src=bgEl.value; }
+
+  const colEl = document.getElementById('ap-primary-color');
+  const hexEl = document.getElementById('ap-primary-hex');
+  if (colEl && a.primaryColor) { colEl.value = a.primaryColor; }
+  if (hexEl && a.primaryColor) { hexEl.value = a.primaryColor; }
+
+  const tEl = document.getElementById('ap-text-color');
+  const thEl = document.getElementById('ap-text-hex');
+  if (tEl && a.textColor) { tEl.value = a.textColor; }
+  if (thEl && a.textColor) { thEl.value = a.textColor; }
+
+  // Background color/gradient
+  const bgMode = a.bgMode || 'solid';
+  setBgMode(bgMode, document.querySelector(`.ap-bg-mode[data-mode="${bgMode}"]`));
+
+  const bgColorEl = document.getElementById('ap-bg-color');
+  const bgHexEl   = document.getElementById('ap-bg-hex');
+  if (bgColorEl && a.bgColor) { bgColorEl.value = a.bgColor; bgHexEl.value = a.bgColor; }
+
+  const g1 = document.getElementById('ap-grad1');
+  const g2 = document.getElementById('ap-grad2');
+  const gd = document.getElementById('ap-grad-dir');
+  if (g1 && a.gradColor1) { g1.value = a.gradColor1; document.getElementById('ap-grad1-hex').value = a.gradColor1; }
+  if (g2 && a.gradColor2) { g2.value = a.gradColor2; document.getElementById('ap-grad2-hex').value = a.gradColor2; }
+  if (gd && a.gradDir)    { gd.value = a.gradDir; }
+
+  previewBg();
+
+  const prev = document.getElementById('ap-hero-preview');
+  const img  = document.getElementById('ap-hero-preview-img');
+  if (prev && img && a.heroBg) { img.src = a.heroBg; prev.style.display = 'block'; }
+}
+
+function setBgMode(mode, btn) {
+  document.querySelectorAll('.ap-bg-mode').forEach(b => {
+    b.style.background = 'var(--surface)';
+    b.style.color = 'var(--text-2)';
+    b.style.borderColor = 'var(--card-border)';
+  });
+  if (btn) {
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--primary)';
   }
+  document.getElementById('ap-solid-wrap').style.display    = mode === 'solid'    ? '' : 'none';
+  document.getElementById('ap-gradient-wrap').style.display = mode === 'gradient' ? '' : 'none';
+  state.appearance.bgMode = mode;
+  previewBg();
 }
+
+function previewBg() {
+  const mode = state.appearance.bgMode || 'solid';
+  let bg;
+  if (mode === 'gradient') {
+    const c1  = document.getElementById('ap-grad1')?.value || '#0a0608';
+    const c2  = document.getElementById('ap-grad2')?.value || '#1a0c11';
+    const dir = document.getElementById('ap-grad-dir')?.value || 'to bottom';
+    bg = `linear-gradient(${dir}, ${c1}, ${c2})`;
+  } else {
+    bg = document.getElementById('ap-bg-color')?.value || '#0a0608';
+  }
+  const prev = document.getElementById('ap-bg-preview');
+  if (prev) prev.style.background = bg;
+}
+
 function syncColorFromHex(which) {
-  const hexEl = document.getElementById('ap-'+which+'-hex');
-  const colorEl = document.getElementById('ap-'+which+'-color');
-  if(!hexEl||!colorEl) return;
-  const v = hexEl.value.trim();
-  if(/^#[0-9a-fA-F]{6}$/.test(v)) colorEl.value = v;
+  const hexVal = document.getElementById('ap-' + which + '-hex')?.value;
+  if (!hexVal || !/^#[0-9A-Fa-f]{6}$/.test(hexVal)) return;
+  const colorPicker = document.getElementById('ap-' + which + '-color');
+  if (colorPicker) colorPicker.value = hexVal;
+  if (which === 'bg') previewBg();
 }
+
 function applyPresetColor(hex) {
-  const pcEl = document.getElementById('ap-primary-color');
-  const pcHex = document.getElementById('ap-primary-hex');
-  if(pcEl) pcEl.value = hex;
-  if(pcHex) pcHex.value = hex;
+  const colEl = document.getElementById('ap-primary-color');
+  const hexEl = document.getElementById('ap-primary-hex');
+  if (colEl) colEl.value = hex;
+  if (hexEl) hexEl.value = hex;
 }
+
 function saveAppearanceSettings() {
-  state.appearance.heroBg = (document.getElementById('ap-hero-bg')?.value||'').trim();
-  const pc = document.getElementById('ap-primary-hex')?.value.trim() || document.getElementById('ap-primary-color')?.value || '';
-  const tc = document.getElementById('ap-text-hex')?.value.trim() || document.getElementById('ap-text-color')?.value || '';
-  state.appearance.primaryColor = /^#[0-9a-fA-F]{6}$/.test(pc) ? pc : '';
-  state.appearance.textColor = /^#[0-9a-fA-F]{6}$/.test(tc) ? tc : '';
+  const a = state.appearance;
+  const bgEl      = document.getElementById('ap-hero-bg');
+  const colEl     = document.getElementById('ap-primary-color');
+  const tEl       = document.getElementById('ap-text-color');
+  const bgColorEl = document.getElementById('ap-bg-color');
+  const g1        = document.getElementById('ap-grad1');
+  const g2        = document.getElementById('ap-grad2');
+  const gd        = document.getElementById('ap-grad-dir');
+
+  if (bgEl)      a.heroBg       = bgEl.value.trim();
+  if (colEl)     a.primaryColor = colEl.value;
+  if (tEl)       a.textColor    = tEl.value;
+  if (bgColorEl) a.bgColor      = bgColorEl.value;
+  if (g1)        a.gradColor1   = g1.value;
+  if (g2)        a.gradColor2   = g2.value;
+  if (gd)        a.gradDir      = gd.value;
+
   saveAppearance();
   applyAppearance();
-  toast('Aparência salva! ✅','success');
+  toast('Aparência salva! ✅', 'success');
 }
+
 function resetAppearance() {
-  state.appearance = { heroBg:'', primaryColor:'', textColor:'' };
+  state.appearance = { heroBg:'', primaryColor:'', textColor:'', bgMode:'solid', bgColor:'', gradColor1:'', gradColor2:'', gradDir:'to bottom' };
   saveAppearance();
   applyAppearance();
   loadAppearanceForm();
-  toast('Aparência resetada','info');
+  toast('Aparência resetada', 'info');
+}
+
+function applyAppearance() {
+  const r = document.documentElement.style;
+  const a = state.appearance;
+
+  // Primary color
+  if (a.primaryColor) {
+    r.setProperty('--primary', a.primaryColor);
+    const hex = a.primaryColor.replace('#','');
+    const ri = parseInt(hex.slice(0,2),16), gi = parseInt(hex.slice(2,4),16), bi = parseInt(hex.slice(4,6),16);
+    r.setProperty('--primary-glow', `rgba(${ri},${gi},${bi},0.35)`);
+    // Derive --primary-h (darker shade)
+    r.setProperty('--primary-h', shadeHex(a.primaryColor, -20));
+  }
+  // Text color
+  if (a.textColor) r.setProperty('--text', a.textColor);
+
+  // Background
+  const mode = a.bgMode || 'solid';
+  if (mode === 'gradient' && a.gradColor1 && a.gradColor2) {
+    const dir = a.gradDir || 'to bottom';
+    document.body.style.background = `linear-gradient(${dir}, ${a.gradColor1}, ${a.gradColor2})`;
+    document.body.style.backgroundAttachment = 'fixed';
+  } else if (mode === 'solid' && a.bgColor) {
+    r.setProperty('--bg', a.bgColor);
+    document.body.style.background = '';
+    document.body.style.backgroundAttachment = '';
+  } else {
+    document.body.style.background = '';
+    document.body.style.backgroundAttachment = '';
+  }
+
+  // Hero bg
+  const heroImg = document.getElementById('hero-img');
+  if (heroImg && a.heroBg) heroImg.src = a.heroBg;
 }
 
 // ============================================================
@@ -2010,9 +2383,26 @@ function init() {
   document.getElementById('top-nav').style.display='none';
   document.getElementById('bottom-nav').style.display='none';
 
-  // Keyboard shortcuts
-  document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  // Check for magic link token in URL (?token=xxx)
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+  if (token) {
+    verifyToken(token);
+    return;
+  }
 
+  // Try restoring existing session from server
+  const sessaoId = localStorage.getItem('pm_session');
+  if (sessaoId) {
+    // Show loading briefly then verify
+    loadSession().then(ok => {
+      if (ok) { updateSidebarUser(); navigateTo('home'); }
+      else navigateTo('login');
+    });
+    return;
+  }
+
+  // Fallback: check legacy localStorage user (dev mode only)
   if (state.user) { updateSidebarUser(); navigateTo('home'); }
   else navigateTo('login');
 }
