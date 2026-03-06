@@ -131,7 +131,7 @@ async function enviarEmailBoasVindas(supabase, email, nome) {
       used:       false
     });
 
-    const link = `${SITE_URL}?token=${token}`;
+    const link = ${SITE_URL}/api/auth/callback?token=${token};
     const firstName = nome ? nome.split(' ')[0] : 'membro';
 
     await fetch('https://api.resend.com/emails', {
