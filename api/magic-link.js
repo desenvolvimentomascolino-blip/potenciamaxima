@@ -85,11 +85,22 @@ function generateToken() {
 async function sendEmail({ to, subject, html }) {
   try {
     const resp = await fetch('https://api.resend.com/emails', {
-      // ... configurações ...
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer re_Zdpj3Zvd_4DWsK2JFYe3vEGZSTPLDPfeq'
+      },
+      body: JSON.stringify({
+        from: 'suporte@tuguiaemocional.store',
+        to: to,
+        subject: subject,
+        html: html
+      })
     });
-    const data = await resp.json(); // <--- O ERRO PODE ESTAR AQUI
+    
     return resp.ok;
   } catch (e) {
+    console.error('Erro no envio:', e);
     return false;
   }
 }
