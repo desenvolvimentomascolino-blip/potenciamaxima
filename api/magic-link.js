@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
   const { data: membro, error: membroErr } = await supabase
     .from('membros')
     .select('id, nome, email, ativo')
-    .eq('email', normalizedEmail)
+    .ilike('email', normalizedEmail)
     .single();
 
   if (membroErr || !membro) {
