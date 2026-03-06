@@ -87,15 +87,23 @@ async function sendEmail({ to, subject, html }) {
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
       },
-      body: JSON.stringify({ from: FROM_EMAIL, to, subject, html })
+      body: JSON.stringify({ 
+        from: 'suporte@tuguiaemocional.store', // Forçado para testar
+        to: to, 
+        subject: subject, 
+        html: html 
+      })
     });
-    const data = await resp.json();
+    
+    const resText = await resp.text();
+    console.log('Resposta do Resend:', resText);
+    
     return resp.ok;
   } catch (e) {
-    console.error('Resend error:', e);
+    console.error('Erro fatal no fetch do Resend:', e);
     return false;
   }
 }
