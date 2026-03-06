@@ -100,6 +100,12 @@ async function sendEmail({ to, subject, html }) {
     
     return resp.ok;
   } catch (e) {
+    return false;
+  }
+}
+    
+    return resp.ok;
+  } catch (e) {
     console.error('Erro no envio:', e);
     return false;
   }
