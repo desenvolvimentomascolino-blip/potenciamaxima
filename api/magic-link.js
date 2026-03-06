@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
     used:       false
   });
 
-  const magicLink = `${SITE_URL}?token=${token}`;
+  const magicLink = `${SITE_URL}/api/verify?token=${token}`;
   const nome = membro.nome ? membro.nome.split(' ')[0] : 'membro';
 
   // Envia e-mail via Resend
