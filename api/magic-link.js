@@ -88,7 +88,8 @@ async function sendEmail({ to, subject, html }) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer re_seu_token_aqui' // <--- COLOQUE SUA CHAVE DO RESEND AQUI DENTRO DAS ASPAS
+        'Authorization': 'Bearer re_seu_token_aqui' /re_Zdpj3Zvd_4DWsK2JFYe3vEGZSTPLDPfeq
+/ <--- COLOQUE SUA CHAVE DO RESEND AQUI DENTRO DAS ASPAS
       },
       body: JSON.stringify({ 
         from: 'suporte@tuguiaemocional.store', 
