@@ -7,8 +7,7 @@ const SUPABASE_URL         = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const RESEND_API_KEY       = process.env.RESEND_API_KEY;
 const SITE_URL             = process.env.SITE_URL || 'https://seu-site.vercel.app';
-const FROM_EMAIL           = process.env.FROM_EMAIL || 'noreply@potenciamaxima.com.br';
-
+const FROM_EMAIL = process.env.FROM_EMAIL || 'acesso@tuguiaemocional.store';
 module.exports = async (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
