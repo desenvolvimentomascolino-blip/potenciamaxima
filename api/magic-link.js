@@ -88,15 +88,21 @@ async function sendEmail({ to, subject, html }) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+        'Authorization': 'Bearer re_seu_token_aqui' // <--- COLOQUE SUA CHAVE DO RESEND AQUI DENTRO DAS ASPAS
       },
       body: JSON.stringify({ 
-        from: 'suporte@tuguiaemocional.store', // Forçado para testar
+        from: 'suporte@tuguiaemocional.store', 
         to: to, 
         subject: subject, 
         html: html 
       })
     });
+    
+    return resp.ok;
+  } catch (e) {
+    return false;
+  }
+}
     
     const resText = await resp.text();
     console.log('Resposta do Resend:', resText);
