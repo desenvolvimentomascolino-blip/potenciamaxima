@@ -100,23 +100,7 @@ async function sendEmail({ to, subject, html }) {
     
     return resp.ok;
   } catch (e) {
-    return false;
-  }
-}
-    
-    return resp.ok;
-  } catch (e) {
     console.error('Erro no envio:', e);
-    return false;
-  }
-}
-    
-    const resText = await resp.text();
-    console.log('Resposta do Resend:', resText);
-    
-    return resp.ok;
-  } catch (e) {
-    console.error('Erro fatal no fetch do Resend:', e);
     return false;
   }
 }
@@ -129,7 +113,6 @@ function buildEmailHtml(nome, link) {
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0608;padding:40px 16px">
     <tr><td align="center">
       <table width="100%" style="max-width:520px;background:#130a0d;border-radius:16px;border:1px solid rgba(232,0,45,0.15);overflow:hidden">
-        <!-- Header -->
         <tr>
           <td style="background:linear-gradient(135deg,#1a0c11,#0d0608);padding:32px 32px 24px;text-align:center;border-bottom:1px solid rgba(232,0,45,0.12)">
             <div style="font-size:36px;margin-bottom:10px">🔐</div>
@@ -137,7 +120,6 @@ function buildEmailHtml(nome, link) {
             <p style="color:rgba(245,232,236,0.5);font-size:12px;margin:6px 0 0;letter-spacing:2px;text-transform:uppercase">Área de Membros Exclusiva</p>
           </td>
         </tr>
-        <!-- Body -->
         <tr>
           <td style="padding:32px">
             <p style="color:#f5e8ec;font-size:18px;font-weight:700;margin:0 0 8px">Olá, ${nome}! 👋</p>
@@ -158,7 +140,6 @@ function buildEmailHtml(nome, link) {
             </div>
           </td>
         </tr>
-        <!-- Footer -->
         <tr>
           <td style="padding:16px 32px 24px;border-top:1px solid rgba(232,0,45,0.08);text-align:center">
             <p style="color:rgba(245,232,236,0.25);font-size:11px;margin:0">© Potência Máxima · Todos os direitos reservados</p>
